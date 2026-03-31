@@ -1,5 +1,5 @@
 from langchain_community.llms.tongyi import Tongyi
-from langchain_ollama import OllamaEmbeddings
+#from langchain_ollama import OllamaEmbeddings
 from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
 import os

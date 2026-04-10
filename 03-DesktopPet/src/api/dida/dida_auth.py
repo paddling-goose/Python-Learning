@@ -11,6 +11,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+NO_PROXY = {"http": None, "https": None}
 
 CLIENT_ID = os.getenv("DIDA_CLIENT_ID")
 CLIENT_SECRET = os.getenv("DIDA_CLIENT_SECRET")
@@ -85,7 +86,7 @@ def authorize() -> dict:
         "code": _auth_code,
         "grant_type": "authorization_code",
         "redirect_uri": REDIRECT_URI,
-    }, auth=(CLIENT_ID, CLIENT_SECRET))
+    }, auth=(CLIENT_ID, CLIENT_SECRET),proxies=NO_PROXY)
     resp.raise_for_status()
     token_data = resp.json()
     save_token(token_data)

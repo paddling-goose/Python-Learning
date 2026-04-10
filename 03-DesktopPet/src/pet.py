@@ -7,6 +7,9 @@ from config.app_config import *
 from loader import load_frames
 from behaviors.behavior import Behavior, IDLE
 
+import ctypes
+ctypes.windll.shcore.SetProcessDpiAwareness(2)  # 告诉 Windows 这是高DPI程序
+
 
 class ClaudePet:
     def __init__(self):

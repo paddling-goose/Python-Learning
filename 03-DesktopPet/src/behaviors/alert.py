@@ -28,12 +28,14 @@ class Alert:
         if self._get_tasks:
             try:
                 tasks = self._get_tasks()
-                due = [t for t in tasks if self._is_due_now(t)]
-                if due:
-                    return f"⏰ {due[0]['title']}"
+                if tasks:
+                    # 把今日所有任务拼成一条消息
+                    titles = [f"・{t['title']}" for t in tasks[:5]]  # 最多显示5条
+                    return "📋 今日任务：\n" + "\n".join(titles)
             except Exception as e:
                 print(f"[Alert] 获取任务失败: {e}")
 
+        # 没有 dida 或任务为空，走内置随机提醒
         if random.random() < 0.3:
             return random.choice(BUILTIN_REMINDERS)
         return None

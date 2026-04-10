@@ -2,11 +2,12 @@ import datetime
 import requests
 from api.dida.dida_auth import get_valid_token
 
+NO_PROXY = {"http": None, "https": None}
 API_BASE = "https://api.dida365.com/open/v1"
 
 
 def _fetch_project_tasks(headers: dict, project_id: str) -> list[dict]:
-    resp = requests.get(f"{API_BASE}/project/{project_id}/data", headers=headers)
+    resp = requests.get(f"{API_BASE}/project/{project_id}/data", headers=headers,proxies=NO_PROXY)
     if resp.status_code != 200:
         return []
     return resp.json().get("tasks", [])
@@ -14,11 +15,15 @@ def _fetch_project_tasks(headers: dict, project_id: str) -> list[dict]:
 
 def get_today_tasks() -> list[dict]:
     token = get_valid_token()
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = {
+    "Authorization": f"Bearer {token}",
+    "User-Agent": "Mozilla/5.0",
+    "Content-Type": "application/json",
+    }   
     today = datetime.date.today().isoformat()
 
     # 拿所有项目 ID
-    resp = requests.get(f"{API_BASE}/project", headers=headers)
+    resp = requests.get(f"{API_BASE}/project", headers=headers,proxies=NO_PROXY)
     resp.raise_for_status()
     project_ids = [p["id"] for p in resp.json() if not p.get("closed")]
 

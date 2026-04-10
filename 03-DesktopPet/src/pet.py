@@ -35,10 +35,11 @@ class ClaudePet:
         self.frames_default = load_frames(ASSETS["default"], PET_SIZE)
         self.frames_blink   = load_frames(ASSETS["blink"],   PET_SIZE)
 
-        self.anim_tick   = 0
-        self.blinking    = False
-        self.bubble_text = ""
-        self.bubble_show = False
+        self.anim_tick = 0
+        self.blinking  = False
+
+        # ── 气泡（正确初始化）─────────────────────────────
+        self.bubble = bubble.Bubble(self.root)
 
         # 行为大脑
         self.behavior = Behavior(PET_SIZE)
@@ -64,15 +65,15 @@ class ClaudePet:
             self.y = new_y
             self.root.geometry(f"+{self.x}+{self.y}")
 
+        # 气泡每帧跟随宠物（无论行走/拖动/弹跳）
+        self._reposition_bubble()
+
         bounce = 0
         if self.behavior.state == IDLE:
             bounce = int(math.sin(self.anim_tick * 0.07) * BOUNCE_AMPLITUDE)
 
         cx = self.W // 2
         oy = 48 + bounce
-
-        if self.bubble_show and self.bubble_text:
-            bubble.draw(self.canvas, self.bubble_text, cx)
 
         frames = self.frames_blink if (self.blinking and self.frames_blink) \
                  else self.frames_default
@@ -103,6 +104,7 @@ class ClaudePet:
             self.y = e.y_root - self.drag_sy
             self.root.geometry(f"+{self.x}+{self.y}")
 
+
     def _on_release(self, e):
         self.dragging = False
         self.behavior.set_position(self.x, self.y)
@@ -122,13 +124,23 @@ class ClaudePet:
         m.tk_popup(e.x_root, e.y_root)
 
     # ── 气泡 ────────────────────────────────────────────
-    def show_bubble(self, text, duration=BUBBLE_DURATION):
-        self.bubble_text = text
-        self.bubble_show = True
-        self.root.after(duration, self._hide_bubble)
+    def _bubble_anchor(self):
+        """计算气泡锚点：宠物头部中心的屏幕坐标"""
+        ax = self.x + self.W // 2
+        ay = self.y + 48  # 头部顶端偏移，可按实际图稿微调
+        return ax, ay
 
-    def _hide_bubble(self):
-        self.bubble_show = False
+    def show_bubble(self, text: str, duration: int = BUBBLE_DURATION):
+        ax, ay = self._bubble_anchor()
+        self.bubble.show(text, anchor_x=ax, anchor_y=ay, duration=duration)
+
+    def _reposition_bubble(self):
+        """拖动时让已显示的气泡跟随宠物"""
+        if self.bubble._win and self.bubble._win.winfo_ismapped():
+            ax, ay = self._bubble_anchor()
+            x = ax - self.bubble._W // 2
+            y = ay - self.bubble._H
+            self.bubble._win.geometry(f"{self.bubble._W}x{self.bubble._H}+{x}+{y}")
 
     # ── 眨眼 ────────────────────────────────────────────
     def _blink_loop(self):
@@ -140,7 +152,7 @@ class ClaudePet:
     # ── 提醒循环（alert.py 驱动）────────────────────────
     def _alert_loop(self):
         msg = self.behavior.get_alert()
-        if msg and not self.bubble_show:
+        if msg:
             self.show_bubble(msg, duration=4000)
         self.root.after(60000, self._alert_loop)  # 每分钟检查一次
 

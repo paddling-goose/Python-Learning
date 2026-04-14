@@ -10,7 +10,6 @@ from behaviors.behavior import Behavior, IDLE
 import ctypes
 ctypes.windll.shcore.SetProcessDpiAwareness(2)  # 告诉 Windows 这是高DPI程序
 
-
 class ClaudePet:
     def __init__(self):
         self.root = tk.Tk()
@@ -39,6 +38,9 @@ class ClaudePet:
     
         self.anim_tick = 0
         self.blinking  = False
+        
+        from settings_window import SettingsWindow
+        self.settings = SettingsWindow(self.root)
 
         # ── 气泡（正确初始化）─────────────────────────────
         self.bubble = bubble.Bubble(self.root)
@@ -114,16 +116,18 @@ class ClaudePet:
 
     def _on_right_click(self, e):
         m = tk.Menu(self.root, tearoff=0)
-        m.add_command(label="👋 打个招呼",
-                      command=lambda: self.show_bubble(self.behavior.greet()))
-        m.add_command(label="🪜 去爬窗口",
-                      command=self.behavior.go_climb)
-        m.add_command(label="🚶 去任务栏",
-                      command=self.behavior.go_taskbar)
-        m.add_command(label="🏠 待机",
-                      command=lambda: self.behavior.set_position(self.x, self.y))
+        m.add_command(label="打个招呼",
+                        command=lambda: self.show_bubble(self.behavior.greet()))
+        m.add_command(label="去爬窗口",
+                        command=self.behavior.go_climb)
+        m.add_command(label="去任务栏",
+                        command=self.behavior.go_taskbar)
+        m.add_command(label="待机",
+                        command=lambda: self.behavior.set_position(self.x, self.y))
+        m.add_command(label="滴答提醒设置",
+                        command=self.settings.open)
         m.add_separator()
-        m.add_command(label="❌ 关闭", command=self.root.destroy)
+        m.add_command(label="退出桌宠", command=self.root.destroy)
         m.tk_popup(e.x_root, e.y_root)
 
     # ── 气泡 ────────────────────────────────────────────

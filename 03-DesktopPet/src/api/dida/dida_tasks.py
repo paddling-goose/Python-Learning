@@ -36,8 +36,8 @@ def get_today_tasks() -> list[dict]:
             if task.get("status", 0) == 2:   # 已完成，跳过
                 continue
             due = (task.get("dueDate") or "")
-            # 今天到期，或没有截止日期也列出来
-            if (due and due[:10] <= today) or not due:
+            # 今天到期列出来
+            if (due and due[:10] <= today):
                 today_tasks.append({
                     "title": task.get("title", "无标题"),
                     "priority": task.get("priority", 0),

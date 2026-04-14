@@ -2,42 +2,39 @@ import os
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# 图片尺寸
-PET_SIZE = 70
+def _assets(*names):
+    """拼接 assets/ 路径，少写重复代码。"""
+    return [os.path.join(_ROOT, "assets", n) for n in names]
 
-# 弹跳幅度（像素）
+
+# ── 显示 ────────────────────────────────────────────────────────────────── #
+PET_SIZE         = 70
 BOUNCE_AMPLITUDE = 4
-
-# 透明背景色（不要改）
 TRANSPARENT_COLOR = "#010101"
 
-# 图片路径
-ASSETS = {
-    "default": [
-        os.path.join(_ROOT, "assets/default_00.jpg"),
-        os.path.join(_ROOT, "assets/default_01.jpg"),
-    ],
-    "blink": [
-        os.path.join(_ROOT, "assets/blink_00.jpg"),
-    ],
-}
+# ── 动画 ────────────────────────────────────────────────────────────────── #
+FRAME_INTERVAL = 50   # ms，每帧间隔
 
-# 动画刷新间隔（毫秒）
-FRAME_INTERVAL = 50
-
-# 眨眼配置（毫秒）
-BLINK_DURATION = 150
+BLINK_DURATION = 150  # ms，眨眼持续时间
 BLINK_MIN      = 2000
 BLINK_MAX      = 5000
 
-# 空闲提醒间隔（毫秒）
-IDLE_MIN = 25000
+# ── 气泡 ────────────────────────────────────────────────────────────────── #
+BUBBLE_DURATION = 2500  # ms，气泡默认显示时长
+
+IDLE_MIN = 25000        # ms，空闲提醒最短间隔
 IDLE_MAX = 50000
 
-# 气泡默认显示时长（毫秒）
-BUBBLE_DURATION = 2500
+# ── 图片 ────────────────────────────────────────────────────────────────── #
+# key 与各状态类的 FRAME_KEY 对应；新增状态只需在此加一行 + 放好图片。
+ASSETS = {
+    "default": _assets("default_00.jpg", "default_01.jpg"),
+    "blink":   _assets("blink_00.jpg"),
+    "climb":   _assets("climb_00.jpg", "climb_01.jpg", "climb_02.jpg"),
+    "sit":     _assets("sit_00.jpg"),
+}
 
-# 点击时随机说的话
+# ── 文案 ────────────────────────────────────────────────────────────────── #
 GREETINGS = [
     "你好呀！🧡",
     "在学RAG吗~",
@@ -48,7 +45,6 @@ GREETINGS = [
     "摸摸我嘛！",
 ]
 
-# 空闲时说的话
 IDLE_MSGS = [
     "喝水了吗？💧",
     "记得休息哦～",

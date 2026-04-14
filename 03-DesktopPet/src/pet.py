@@ -32,9 +32,11 @@ class ClaudePet:
         self.y = sh - self.H - 60
         self.root.geometry(f"+{self.x}+{self.y}")
 
-        self.frames_default = load_frames(ASSETS["default"], PET_SIZE)
-        self.frames_blink   = load_frames(ASSETS["blink"],   PET_SIZE)
-
+        self.all_frames = {
+            key: load_frames(paths, PET_SIZE)
+            for key, paths in ASSETS.items()
+        }
+    
         self.anim_tick = 0
         self.blinking  = False
 
@@ -75,8 +77,9 @@ class ClaudePet:
         cx = self.W // 2
         oy = 48 + bounce
 
-        frames = self.frames_blink if (self.blinking and self.frames_blink) \
-                 else self.frames_default
+        frames = self.all_frames.get(self.behavior.frame_key, self.all_frames["default"])
+        if self.blinking and self.all_frames.get("blink"):
+            frames = self.all_frames["blink"]
 
         if frames:
             idx = (self.anim_tick // 8) % len(frames)

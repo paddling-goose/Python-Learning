@@ -26,11 +26,12 @@ class ClaudePet:
         self.canvas.pack()
 
         sw = self.root.winfo_screenwidth()
-        sh = self.root.winfo_screenheight()
+        sh = self.root.winfo_screenheight()  # 初始位置
         self.x = sw - self.W - 40
         self.y = sh - self.H - 60
         self.root.geometry(f"+{self.x}+{self.y}")
 
+        # 把所有动画帧按状态key加载入字典
         self.all_frames = {
             key: load_frames(paths, PET_SIZE)
             for key, paths in ASSETS.items()
@@ -42,7 +43,7 @@ class ClaudePet:
         from settings_window import SettingsWindow
         self.settings = SettingsWindow(self.root)
 
-        # ── 气泡（正确初始化）─────────────────────────────
+        # 气泡（正确初始化
         self.bubble = bubble.Bubble(self.root)
 
         # 行为大脑
@@ -58,7 +59,7 @@ class ClaudePet:
         self._alert_loop()
         self._draw_loop()
 
-    # ── 绘制 ────────────────────────────────────────────
+    #ANCHOR - 绘制
     def _draw_loop(self):
         self.canvas.delete("all")
         self.anim_tick += 1
@@ -90,7 +91,7 @@ class ClaudePet:
 
         self.root.after(FRAME_INTERVAL, self._draw_loop)
 
-    # ── 事件 ────────────────────────────────────────────
+    #ANCHOR - 事件
     def _bind_events(self):
         self.canvas.bind("<ButtonPress-1>",   self._on_press)
         self.canvas.bind("<B1-Motion>",       self._on_drag)
@@ -108,7 +109,6 @@ class ClaudePet:
             self.x = e.x_root - self.drag_sx
             self.y = e.y_root - self.drag_sy
             self.root.geometry(f"+{self.x}+{self.y}")
-
 
     def _on_release(self, e):
         self.dragging = False
@@ -130,7 +130,7 @@ class ClaudePet:
         m.add_command(label="退出桌宠", command=self.root.destroy)
         m.tk_popup(e.x_root, e.y_root)
 
-    # ── 气泡 ────────────────────────────────────────────
+    # 气泡
     def _bubble_anchor(self):
         """计算气泡锚点：宠物头部中心的屏幕坐标"""
         ax = self.x + self.W // 2

@@ -7,6 +7,9 @@ API_BASE = "https://api.dida365.com/open/v1"
 
 
 def _get_headers() -> dict:
+    """
+    从 dida_auth模块获取有效的token，构造并返回HTTP请求头
+    """
     token = get_valid_token()
     return {
         "Authorization": f"Bearer {token}",
@@ -16,12 +19,19 @@ def _get_headers() -> dict:
 
 
 def _fetch_project_tasks(headers: dict, project_id: str) -> list[dict]:
-    resp = requests.get(f"{API_BASE}/project/{project_id}/data",
-                        headers=headers, proxies=NO_PROXY)
+    """
+    根据项目id拉取该项目下所有任务
+    """
+    resp = requests.get(
+        f"{API_BASE}/project/{project_id}/data",
+        headers=headers, 
+        proxies=NO_PROXY,
+    )
     if resp.status_code != 200:
         return []
     return resp.json().get("tasks", [])
 
+#ANCHOR - 公开业务函数
 
 def get_all_projects() -> list[dict]:
     """
@@ -30,7 +40,11 @@ def get_all_projects() -> list[dict]:
     收件箱固定追加在最后。
     """
     headers = _get_headers()
-    resp = requests.get(f"{API_BASE}/project", headers=headers, proxies=NO_PROXY)
+    resp = requests.get(
+        f"{API_BASE}/project",
+        headers=headers, 
+        proxies=NO_PROXY
+    )
     resp.raise_for_status()
     projects = [
         {"id": p["id"], "name": p.get("name", "未命名")}
@@ -44,8 +58,10 @@ def get_all_projects() -> list[dict]:
 def get_today_tasks(selected_project_ids: list[str] | None = None) -> list[dict]:
     """
     返回今日到期的未完成任务。
-    selected_project_ids: 要检查的项目 ID 列表；
-                          传 None 时退化为原来的行为（检查全部项目）。
+
+    params:
+        selected_project_ids: 要检查的项目 ID 列表；
+                            传 None 时退化为原来的行为（检查全部项目）。
     """
     headers = _get_headers()
     today = datetime.date.today().isoformat()
